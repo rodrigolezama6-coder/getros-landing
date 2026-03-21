@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROS — Restaurant Operating System</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080a0f;
+  --surface: #0d1018;
+  --surface2: #131720;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.12);
+  --text: #eef0f6;
+  --muted: #6b7280;
+  --accent: #c8f135;
+  --accent-dim: rgba(200,241,53,0.12);
+  --accent2: #a8d420;
+  --blue: #3b82f6;
+  --radius: 14px;
+  --radius-lg: 20px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── NOISE OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 20px 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(8,10,15,0.7);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.nav-logo span { color: var(--accent); }
+
+.nav-links {
+  display: flex; align-items: center; gap: 36px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 14px; color: var(--muted);
+  text-decoration: none; transition: color .2s;
+}
+
+.nav-links a:hover { color: var(--text); }
+
+.nav-cta {
+  background: var(--accent); color: #0a0e04;
+  border: none; border-radius: 8px;
+  padding: 9px 22px; font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all .2s; text-decoration: none;
+}
+
+.nav-cta:hover { background: var(--accent2); transform: translateY(-1px); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 120px 24px 80px;
+  position: relative; overflow: hidden;
+}
+
+/* Grid background */
+.hero::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(200,241,53,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,241,53,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 0%, transparent 100%);
+}
+
+.hero-glow {
+  position: absolute;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(200,241,53,0.08) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -60%);
+  pointer-events: none;
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(200,241,53,0.25);
+  border-radius: 99px;
+  padding: 6px 16px;
+  font-size: 12px; font-weight: 500; color: var(--accent);
+  margin-bottom: 32px;
+  animation: fadeUp .6s ease both;
+}
+
+.hero-badge .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .5; transform: scale(0.8); }
+}
+
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(48px, 8vw, 88px);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  max-width: 900px;
+  margin-bottom: 24px;
+  animation: fadeUp .7s .1s ease both;
+}
+
+h1 em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.hero-sub {
+  font-size: clamp(17px, 2.5vw, 21px);
+  color: var(--muted);
+  max-width: 560px;
+  font-weight: 300;
+  margin-bottom: 48px;
+  animation: fadeUp .7s .2s ease both;
+  line-height: 1.5;
+}
+
+.hero-actions {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  justify-content: center;
+  animation: fadeUp .7s .3s ease both;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #0a0e04;
+  border: none; border-radius: 10px;
+  padding: 14px 32px;
+  font-size: 16px; font-weight: 600;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  text-decoration: none;
+  transition: all .2s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+
+.btn-primary:hover { background: var(--accent2); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(200,241,53,0.25); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 14px 28px;
+  font-size: 16px; font-weight: 400;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  text-decoration: none;
+  transition: all .2s;
+}
+
+.btn-secondary:hover { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.04); }
+
+.hero-note {
+  margin-top: 20px;
+  font-size: 13px; color: var(--muted);
+  animation: fadeUp .7s .4s ease both;
+}
+
+.hero-note span { color: var(--accent); }
+
+/* ── SOCIAL PROOF STRIP ── */
+.strip {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 24px 48px;
+  display: flex; align-items: center; justify-content: center;
+  gap: 48px; flex-wrap: wrap;
+  background: var(--surface);
+}
+
+.strip-item {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: var(--muted);
+}
+
+.strip-item strong { color: var(--text); font-size: 20px; font-family: 'Syne', sans-serif; font-weight: 700; }
+
+/* ── SECTIONS ── */
+section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 100px 24px;
+}
+
+.section-label {
+  font-size: 12px; font-weight: 500;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+
+.section-sub {
+  font-size: 18px; color: var(--muted);
+  font-weight: 300; max-width: 560px;
+  line-height: 1.6;
+}
+
+/* ── PROBLEM SECTION ── */
+.problem-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 60px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.problem-item {
+  padding: 36px 32px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  transition: background .2s;
+}
+
+.problem-item:last-child { border-right: none; }
+.problem-item:hover { background: var(--surface2); }
+
+.problem-emoji { font-size: 28px; margin-bottom: 16px; }
+.problem-title { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+.problem-text { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+/* ── FEATURES ── */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 60px;
+}
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  transition: all .2s;
+  position: relative; overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0; transition: opacity .3s;
+}
+
+.feature-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+.feature-card:hover::before { opacity: 1; }
+
+.feature-icon {
+  width: 44px; height: 44px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(200,241,53,0.2);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.feature-title { font-size: 18px; font-weight: 500; margin-bottom: 10px; }
+.feature-text { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+.feature-card.wide {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.feature-modules {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px;
+}
+
+.mod-pill {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border2);
+  border-radius: 99px;
+  padding: 5px 14px;
+  font-size: 12px; color: var(--muted);
+}
+
+/* ── HOW IT WORKS ── */
+.steps {
+  display: flex; flex-direction: column; gap: 2px;
+  margin-top: 60px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  transition: background .2s;
+}
+
+.step:last-child { border-bottom: none; }
+.step:hover { background: var(--surface2); }
+
+.step-num {
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 32px; font-weight: 800;
+  color: var(--border2);
+  border-right: 1px solid var(--border);
+  padding: 32px;
+}
+
+.step-content { padding: 32px; }
+.step-title { font-size: 18px; font-weight: 500; margin-bottom: 8px; }
+.step-text { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+/* ── PRICING ── */
+.pricing-wrap {
+  display: flex; justify-content: center;
+  margin-top: 60px;
+}
+
+.pricing-card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 48px;
+  max-width: 520px; width: 100%;
+  position: relative; overflow: hidden;
+}
+
+.pricing-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--accent);
+}
+
+.pricing-badge {
+  display: inline-block;
+  background: var(--accent-dim);
+  border: 1px solid rgba(200,241,53,0.2);
+  border-radius: 99px;
+  padding: 4px 14px;
+  font-size: 11px; font-weight: 600;
+  color: var(--accent);
+  letter-spacing: .06em; text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.pricing-amount {
+  display: flex; align-items: baseline; gap: 4px;
+  margin-bottom: 8px;
+}
+
+.pricing-currency { font-size: 24px; font-weight: 500; color: var(--muted); margin-top: 8px; }
+.pricing-number {
+  font-family: 'Syne', sans-serif;
+  font-size: 72px; font-weight: 800;
+  line-height: 1; letter-spacing: -0.03em;
+  color: var(--text);
+}
+.pricing-period { font-size: 18px; color: var(--muted); }
+
+.pricing-desc { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
+
+.pricing-features {
+  list-style: none;
+  display: flex; flex-direction: column; gap: 14px;
+  margin-bottom: 40px;
+}
+
+.pricing-features li {
+  display: flex; align-items: flex-start; gap: 12px;
+  font-size: 15px; color: var(--text);
+}
+
+.check {
+  width: 20px; height: 20px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(200,241,53,0.3);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+  font-size: 11px; color: var(--accent);
+}
+
+.pricing-btn {
+  width: 100%;
+  background: var(--accent);
+  color: #0a0e04;
+  border: none; border-radius: 10px;
+  padding: 16px;
+  font-size: 16px; font-weight: 700;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all .2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+
+.pricing-btn:hover { background: var(--accent2); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(200,241,53,0.3); }
+
+.pricing-note {
+  text-align: center;
+  font-size: 13px; color: var(--muted);
+  margin-top: 16px;
+}
+
+/* ── TESTIMONIALS ── */
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 60px;
+}
+
+.testimonial {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  transition: border-color .2s;
+}
+
+.testimonial:hover { border-color: var(--border2); }
+
+.stars { color: var(--accent); font-size: 14px; margin-bottom: 16px; letter-spacing: 2px; }
+.testimonial-text { font-size: 15px; color: var(--text); line-height: 1.7; margin-bottom: 20px; font-style: italic; }
+.testimonial-author { display: flex; align-items: center; gap: 12px; }
+.author-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--accent-dim);
+  border: 1px solid rgba(200,241,53,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+}
+.author-name { font-size: 14px; font-weight: 500; }
+.author-role { font-size: 12px; color: var(--muted); }
+
+/* ── FAQ ── */
+.faq-list {
+  margin-top: 60px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.faq-item:last-child { border-bottom: none; }
+
+.faq-q {
+  width: 100%;
+  background: none; border: none;
+  padding: 24px 32px;
+  font-size: 16px; font-weight: 500;
+  color: var(--text);
+  text-align: left; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: 'DM Sans', sans-serif;
+  transition: background .2s;
+}
+
+.faq-q:hover { background: var(--surface2); }
+.faq-q .arrow { font-size: 18px; color: var(--muted); transition: transform .3s; }
+.faq-q.open .arrow { transform: rotate(45deg); color: var(--accent); }
+
+.faq-a {
+  max-height: 0; overflow: hidden;
+  transition: max-height .4s ease, padding .3s;
+  font-size: 15px; color: var(--muted); line-height: 1.7;
+  padding: 0 32px;
+}
+
+.faq-a.open { max-height: 300px; padding: 0 32px 24px; }
+
+/* ── CTA FINAL ── */
+.cta-section {
+  text-align: center;
+  padding: 120px 24px;
+  position: relative; overflow: hidden;
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute;
+  width: 700px; height: 400px;
+  background: radial-gradient(ellipse, rgba(200,241,53,0.07) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.cta-section .section-title { max-width: 700px; margin: 0 auto 24px; }
+.cta-section .section-sub { margin: 0 auto 48px; }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 24px;
+  max-width: 1100px; margin: 0 auto;
+}
+
+.footer-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 18px;
+  color: var(--text);
+}
+
+.footer-logo span { color: var(--accent); }
+
+.footer-links {
+  display: flex; gap: 28px; list-style: none; flex-wrap: wrap;
+}
+
+.footer-links a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color .2s; }
+.footer-links a:hover { color: var(--text); }
+
+.footer-copy { font-size: 13px; color: var(--muted); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {/* originally had opacity:0 */
+  opacity: 1; transform: translateY(0);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.reveal.visible { opacity: 1; transform: none; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  nav { padding: 16px 20px; }
+  .nav-links { display: none; }
+  .problem-grid { grid-template-columns: 1fr; }
+  .features-grid { grid-template-columns: 1fr; }
+  .feature-card.wide { grid-template-columns: 1fr; }
+  .testimonials-grid { grid-template-columns: 1fr; }
+  .steps .step { grid-template-columns: 60px 1fr; }
+  footer { flex-direction: column; gap: 16px; padding: 32px 20px; }
+  .strip { gap: 24px; padding: 20px; }
+  .pricing-card { padding: 32px 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><span>R</span>.<span>O</span>.<span>S</span></div>
+  <ul class="nav-links">
+    <li><a href="#features">Módulos</a></li>
+    <li><a href="#how">Cómo funciona</a></li>
+    <li><a href="#pricing">Precio</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ul>
+  <a href="#pricing" class="nav-cta">Comenzar — $100 USD/año</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Restaurant Operating System · getros.io
+  </div>
+
+  <h1>El sistema operativo<br>de tu <em>restaurante</em></h1>
+
+  <p class="hero-sub">
+    P&L en tiempo real, costeo de menú, fiscalidad y auditorías — todo en un solo lugar. Diseñado para el restaurantero que quiere crecer con números, no con instinto.
+  </p>
+
+  <div class="hero-actions">
+    <a href="#pricing" class="btn-primary">
+      Comenzar — $100 USD/año
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a href="#features" class="btn-secondary">Ver módulos</a>
+  </div>
+
+  <p class="hero-note">
+    <span>$100 USD</span> al año · Cancela cuando quieras · Sin contratos
+  </p>
+</div>
+
+<!-- STRIP -->
+<div class="strip">
+  <div class="strip-item"><strong>650K+</strong> &nbsp;restaurantes en México</div>
+  <div class="strip-item"><strong>$0</strong> &nbsp;costo de instalación</div>
+  <div class="strip-item"><strong>96%</strong> &nbsp;sin control financiero hoy</div>
+  <div class="strip-item"><strong>5 min</strong> &nbsp;para empezar</div>
+</div>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="reveal">
+    <div class="section-label">El problema</div>
+    <h2 class="section-title">Tu restaurante vende.<br>¿Pero gana?</h2>
+    <p class="section-sub">La mayoría de los restauranteros no saben su margen real, su food cost ni cuánto deben al SAT en este momento.</p>
+  </div>
+
+  <div class="problem-grid reveal">
+    <div class="problem-item">
+      <div class="problem-emoji">📊</div>
+      <div class="problem-title">Sin P&L claro</div>
+      <div class="problem-text">El Excel desorganizado o el "el contador me manda algo al mes" no es suficiente para tomar decisiones en tiempo real.</div>
+    </div>
+    <div class="problem-item">
+      <div class="problem-emoji">🍽️</div>
+      <div class="problem-title">Costeo a ojo</div>
+      <div class="problem-text">Poner precios sin saber el costo exacto de cada platillo significa que muchos restaurantes regalan margen sin saberlo.</div>
+    </div>
+    <div class="problem-item">
+      <div class="problem-emoji">🏛️</div>
+      <div class="problem-title">Sorpresas fiscales</div>
+      <div class="problem-text">El IVA, ISR y IMSS se acumulan sin control. La declaración llega y el dinero ya no está. ROS lo previene.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="reveal">
+    <div class="section-label">Módulos</div>
+    <h2 class="section-title">Todo lo que tu restaurante<br>necesita, en un sistema</h2>
+    <p class="section-sub">Desde el P&L mensual hasta el costeo de cada bebida — con guías integradas para que sepas exactamente qué hacer.</p>
+  </div>
+
+  <div class="features-grid">
+
+    <div class="feature-card wide reveal">
+      <div>
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">P&L con semáforos inteligentes</div>
+        <div class="feature-text">Ingresa tus números y ROS calcula automáticamente tus márgenes. Verde = vas bien. Amarillo = revisa. Rojo = actúa ahora. Sin necesitar saber contabilidad.</div>
+        <div class="feature-modules">
+          <span class="mod-pill">Ingresos</span>
+          <span class="mod-pill">COGS</span>
+          <span class="mod-pill">Utilidad bruta</span>
+          <span class="mod-pill">Gastos operativos</span>
+          <span class="mod-pill">EBITDA</span>
+          <span class="mod-pill">Utilidad neta</span>
+          <span class="mod-pill">P&L anual 12 meses</span>
+        </div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:24px;font-size:13px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+          <span style="color:var(--muted)">Total ingresos</span>
+          <span style="font-weight:500">$180,000</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="color:var(--muted)">Food cost</span>
+          <span style="display:flex;align-items:center;gap:8px">30% <span style="background:#14532d;color:#4ade80;padding:1px 8px;border-radius:99px;font-size:11px">✅ Óptimo</span></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="color:var(--muted)">Nómina</span>
+          <span style="display:flex;align-items:center;gap:8px">31% <span style="background:#422006;color:#fbbf24;padding:1px 8px;border-radius:99px;font-size:11px">⚠️ Revisar</span></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
+          <span style="font-weight:500">Utilidad neta</span>
+          <span style="color:#c8f135;font-weight:600;font-size:16px">$14,400 · 8%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-card reveal">
+      <div class="feature-icon">🧾</div>
+      <div class="feature-title">Costeo de menú por categoría</div>
+      <div class="feature-text">Alimentos con factor 3.3x, bebidas con licor al 20% + 10% indirectos, vino 2–2.5x por copa, café con factor 5x. El precio sugerido se calcula solo.</div>
+    </div>
+
+    <div class="feature-card reveal">
+      <div class="feature-icon">🏛️</div>
+      <div class="feature-title">Fiscalidad completa</div>
+      <div class="feature-text">IVA mensual, ISR provisional, IMSS e INFONAVIT. Calendario de vencimientos para que nunca te sorprenda el SAT.</div>
+    </div>
+
+    <div class="feature-card reveal">
+      <div class="feature-icon">✅</div>
+      <div class="feature-title">Auditorías y checklists</div>
+      <div class="feature-text">Checklists semanales, mensuales, trimestrales y anuales. Extintores, licencias, costeo actualizado, flujo de efectivo sano — todo controlado.</div>
+    </div>
+
+    <div class="feature-card reveal">
+      <div class="feature-icon">📁</div>
+      <div class="feature-title">Permisos y licencias</div>
+      <div class="feature-text">Protección civil, bomberos, licencia de funcionamiento, contratos de renta. Tu carpeta legal siempre al día y en un solo lugar.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="reveal">
+    <div class="section-label">Cómo funciona</div>
+    <h2 class="section-title">Listo en 5 minutos</h2>
+    <p class="section-sub">Sin instalaciones, sin configuraciones complejas. Accedes desde cualquier dispositivo.</p>
+  </div>
+
+  <div class="steps reveal">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-content">
+        <div class="step-title">Crea tu cuenta y paga</div>
+        <div class="step-text">$100 USD al año. Acceso inmediato. Sin contratos ni letras chiquitas.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-content">
+        <div class="step-title">Configura tu restaurante</div>
+        <div class="step-text">Nombre, régimen fiscal, número de empleados y ubicación. Toma 3 minutos.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-content">
+        <div class="step-title">Ingresa tus primeros números</div>
+        <div class="step-text">Ventas del mes, costos principales y gastos. ROS hace el resto — márgenes, semáforos y alertas automáticas.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-content">
+        <div class="step-title">Toma decisiones con datos</div>
+        <div class="step-text">Sabe exactamente dónde está tu dinero, qué platillos son más rentables y cuánto debes apartar para impuestos cada mes.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" style="text-align:center">
+  <div class="reveal">
+    <div class="section-label">Precio</div>
+    <h2 class="section-title">Simple. Sin sorpresas.</h2>
+    <p class="section-sub" style="margin:0 auto">Un solo plan con todo incluido. El ROI promedio en el primer mes supera el costo anual.</p>
+  </div>
+
+  <div class="pricing-wrap reveal">
+    <div class="pricing-card">
+      <div class="pricing-badge">Plan Pro · Todo incluido</div>
+      <div class="pricing-amount">
+        <span class="pricing-currency">USD</span>
+        <span class="pricing-number">100</span>
+        <span class="pricing-period">/año</span>
+      </div>
+      <p class="pricing-desc">Menos de $8.50 USD al mes. Menos que un almuerzo de negocios.</p>
+
+      <ul class="pricing-features">
+        <li><span class="check">✓</span>P&L mensual con semáforos automáticos</li>
+        <li><span class="check">✓</span>P&L anual 12 meses comparativo</li>
+        <li><span class="check">✓</span>Costeo de menú (alimentos, bebidas, vino, café)</li>
+        <li><span class="check">✓</span>Fiscalidad completa (IVA, ISR, IMSS)</li>
+        <li><span class="check">✓</span>Auditorías y checklists por área</li>
+        <li><span class="check">✓</span>Permisos y licencias digitalizados</li>
+        <li><span class="check">✓</span>Acceso a comunidad Discord privada</li>
+        <li><span class="check">✓</span>Manuales y guías integradas en cada módulo</li>
+        <li><span class="check">✓</span>Actualizaciones incluidas todo el año</li>
+      </ul>
+
+      <!-- STRIPE BUTTON — reemplaza href con tu Payment Link de Stripe -->
+      <a href="https://buy.stripe.com/6oU28r7Ql9e3eNg1wlcbC00" class="pricing-btn">
+        Comenzar — $100 USD/año
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <p class="pricing-note">Pago seguro con Stripe · Garantía de 7 días</p>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="reveal">
+    <div class="section-label">Primeros clientes</div>
+    <h2 class="section-title">Lo que dicen los<br>restauranteros</h2>
+  </div>
+
+  <div class="testimonials-grid reveal">
+    <div class="testimonial">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">"Por primera vez sé exactamente cuánto gana mi restaurante cada mes. Antes solo veía la caja, ahora veo el negocio completo."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">🍽️</div>
+        <div>
+          <div class="author-name">Carlos M.</div>
+          <div class="author-role">Restaurante de autor, Puebla</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">"El costeo de menú me cambió la vida. Tenía platillos que me costaban más de lo que cobraba y no lo sabía. ROS me lo mostró en minutos."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">☕</div>
+        <div>
+          <div class="author-name">Ana R.</div>
+          <div class="author-role">Cafetería, CDMX</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">"El módulo de fiscalidad me ayudó a entender cuánto debo apartar cada mes para el SAT. Nunca más sorpresas a fin de año."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">🍷</div>
+        <div>
+          <div class="author-name">Diego L.</div>
+          <div class="author-role">Vinoteca, Guadalajara</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="reveal">
+    <div class="section-label">FAQ</div>
+    <h2 class="section-title">Preguntas frecuentes</h2>
+  </div>
+
+  <div class="faq-list reveal">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        ¿Necesito saber contabilidad para usar ROS?
+        <span class="arrow">+</span>
+      </button>
+      <div class="faq-a">No. ROS está diseñado para dueños de restaurantes, no para contadores. Cada módulo tiene instrucciones claras y los semáforos te dicen exactamente si vas bien o si necesitas actuar.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        ¿Funciona en mi celular?
+        <span class="arrow">+</span>
+      </button>
+      <div class="faq-a">Sí. ROS funciona en cualquier dispositivo con navegador — computadora, tablet o celular. No necesitas instalar nada.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        ¿Mis datos están seguros?
+        <span class="arrow">+</span>
+      </button>
+      <div class="faq-a">Sí. Tu información está encriptada y es completamente privada. Ningún otro restaurante puede ver tus datos. Cumplimos con la Ley Federal de Protección de Datos Personales de México.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        ¿Puedo cancelar cuando quiera?
+        <span class="arrow">+</span>
+      </button>
+      <div class="faq-a">Sí. Si cancelas dentro de los primeros 7 días te devolvemos el pago completo. Después del período de prueba, tu suscripción corre hasta el fin del año pagado.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        ¿Incluye soporte?
+        <span class="arrow">+</span>
+      </button>
+      <div class="faq-a">Sí. Todos los suscriptores tienen acceso al Discord privado de ROS donde puedes hacer preguntas, compartir ideas y recibir soporte del equipo. También ofrecemos sesiones de asesoría personalizada con costo adicional.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        ¿Se conecta con mi sistema de punto de venta?
+        <span class="arrow">+</span>
+      </button>
+      <div class="faq-a">En la versión actual ingresas tus números manualmente, lo que toma menos de 15 minutos al mes. La integración automática con sistemas como Soft Restaurant y Parrot está en desarrollo y llegará en los próximos meses.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<div class="cta-section">
+  <div class="section-label">Únete ahora</div>
+  <h2 class="section-title reveal">Tu restaurante merece<br>un <em style="color:var(--accent);font-style:normal">sistema operativo</em></h2>
+  <p class="section-sub reveal">Empieza hoy. Tienes los números de tu negocio en tu mano en menos de 5 minutos.</p>
+  <div class="reveal">
+    <a href="#pricing" class="btn-primary" style="font-size:17px;padding:16px 40px">
+      Comenzar — $100 USD/año
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <p style="margin-top:16px;font-size:13px;color:var(--muted)">Garantía de 7 días · Sin contratos · Cancela cuando quieras</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo"><span>R</span>.<span>O</span>.<span>S</span> &nbsp;<span style="font-weight:300;font-size:14px;color:var(--muted)">Restaurant Operating System</span></div>
+  <ul class="footer-links">
+    <li><a href="#features">Módulos</a></li>
+    <li><a href="#pricing">Precio</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="/cdn-cgi/l/email-protection#eb8384878aab8c8e9f998498c58284">Contacto</a></li>
+    <li><a href="#">Privacidad</a></li>
+    <li><a href="#">Términos</a></li>
+  </ul>
+  <div class="footer-copy">© 2025 ROS · getros.io</div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// Reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// FAQ toggle
+function toggleFaq(btn) {
+  const answer = btn.nextElementSibling;
+  const isOpen = btn.classList.contains('open');
+  document.querySelectorAll('.faq-q.open').forEach(b => {
+    b.classList.remove('open');
+    b.nextElementSibling.cl
