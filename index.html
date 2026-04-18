@@ -132,6 +132,15 @@ section { max-width: 1100px; margin: 0 auto; padding: 100px 24px; }
 .pricing-btn:hover { background: var(--accent2); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(200,241,53,0.3); }
 .pricing-note { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; }
 
+/* SCREENSHOTS */
+.screenshots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 60px; }
+.screenshot-item { display: flex; flex-direction: column; }
+.screenshot-card { aspect-ratio: 3/2; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 12px 32px rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; transition: transform .2s, border-color .2s; position: relative; }
+.screenshot-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.2); }
+.screenshot-placeholder { font-size: 14px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: .02em; }
+.screenshot-caption { margin-top: 14px; font-size: 13px; color: var(--muted); line-height: 1.5; text-align: center; }
+.screenshot-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
 /* TESTIMONIALS */
 .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 60px; }
 .testimonial { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; transition: border-color .2s; }
@@ -182,6 +191,7 @@ footer { border-top: 1px solid var(--border); padding: 48px; display: flex; alig
   .features-grid { grid-template-columns: 1fr; }
   .feature-card.wide { grid-template-columns: 1fr; }
   .testimonials-grid { grid-template-columns: 1fr; }
+  .screenshots-grid { grid-template-columns: 1fr; }
   .steps .step { grid-template-columns: 60px 1fr; }
   footer { flex-direction: column; gap: 16px; padding: 32px 20px; }
   .strip { gap: 24px; padding: 20px; }
@@ -246,9 +256,9 @@ src="https://www.facebook.com/tr?id=1656119422255053&ev=PageView&noscript=1"
     <span class="dot"></span>
     Construido en cocinas reales · Más de 10 años de operación
   </div>
-  <h1>El sistema que construimos<br>para <em>nuestros restaurantes.</em><br>Ahora es tuyo.</h1>
+  <h1>Controla las finanzas de tu restaurante en <em>15 minutos al mes.</em></h1>
   <p class="hero-sub">
-    Más de 10 años operando restaurantes en México nos enseñaron lo que nadie te dice. P&L en tiempo real, costeo de menú, control financiero — todo en un solo lugar. Diseñado por restauranteros, para restauranteros.
+    El sistema que construimos en 10 años operando restaurantes en México. P&L semanal, costeo de menú, control fiscal. Sin Excel, sin ser contador.
   </p>
   <div class="hero-actions">
     <a href="#pricing" class="btn-primary">
@@ -256,9 +266,6 @@ src="https://www.facebook.com/tr?id=1656119422255053&ev=PageView&noscript=1"
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </a>
     <a href="#historia" class="btn-secondary">Nuestra historia</a>
-  </div>
-  <div style="margin-top:16px;animation:fadeUp .7s .35s ease both">
-    <a href="https://calendly.com/rodrigolezama6/intro-r-o-s" target="_blank" class="btn-ghost">📞 Agenda una llamada gratuita de 30 min</a>
   </div>
   <p class="hero-note">
     <span>$2,000 MXN</span> al año · Cancela cuando quieras · Sin contratos
@@ -269,8 +276,8 @@ src="https://www.facebook.com/tr?id=1656119422255053&ev=PageView&noscript=1"
 <div class="strip">
   <div class="strip-item"><strong>10+</strong> &nbsp;años de operación real</div>
   <div class="strip-item"><strong>650K+</strong> &nbsp;restaurantes en México</div>
-  <div class="strip-item"><strong>96%</strong> &nbsp;sin control financiero hoy</div>
-  <div class="strip-item"><strong>$166</strong> &nbsp;MXN al mes</div>
+  <div class="strip-item"><strong>15 min</strong> &nbsp;al mes es todo lo que necesitas</div>
+  <div class="strip-item"><strong>7 días</strong> &nbsp;de garantía</div>
 </div>
 
 <!-- HISTORIA -->
@@ -319,6 +326,45 @@ src="https://www.facebook.com/tr?id=1656119422255053&ev=PageView&noscript=1"
       <div class="problem-title">Sorpresas fiscales</div>
       <div class="problem-text">El IVA, ISR e IMSS se acumulan sin control. La declaración llega y el dinero ya no está. ROS te dice cada mes exactamente cuánto apartar.</div>
     </div>
+  </div>
+</section>
+
+<!-- SCREENSHOTS -->
+<section id="screenshots">
+  <div class="reveal">
+    <div class="section-label">El producto</div>
+    <h2 class="section-title">Así se ve ROS<br>por dentro</h2>
+    <p class="section-sub">Sin demos, sin trucos. Esto es exactamente lo que vas a usar.</p>
+  </div>
+  <div class="screenshots-grid reveal">
+
+    <!-- REEMPLAZAR PLACEHOLDER CON IMAGEN REAL -->
+    <div class="screenshot-item">
+      <div class="screenshot-card">
+        <div class="screenshot-placeholder">[Screenshot: P&amp;L con semáforos]</div>
+      </div>
+      <p class="screenshot-caption">Verde, amarillo, rojo. Sabes si vas bien en 10 segundos.</p>
+    </div>
+    <!-- FIN PLACEHOLDER -->
+
+    <!-- REEMPLAZAR PLACEHOLDER CON IMAGEN REAL -->
+    <div class="screenshot-item">
+      <div class="screenshot-card">
+        <div class="screenshot-placeholder">[Screenshot: Costeo de menú]</div>
+      </div>
+      <p class="screenshot-caption">Factor 3.3x, bebidas 20%, vino 2–2.5x. Calculado solo.</p>
+    </div>
+    <!-- FIN PLACEHOLDER -->
+
+    <!-- REEMPLAZAR PLACEHOLDER CON IMAGEN REAL -->
+    <div class="screenshot-item">
+      <div class="screenshot-card">
+        <div class="screenshot-placeholder">[Screenshot: Calendario fiscal]</div>
+      </div>
+      <p class="screenshot-caption">IVA, ISR, IMSS. Cuánto apartar y cuándo pagarlo.</p>
+    </div>
+    <!-- FIN PLACEHOLDER -->
+
   </div>
 </section>
 
@@ -461,40 +507,6 @@ src="https://www.facebook.com/tr?id=1656119422255053&ev=PageView&noscript=1"
   </div>
 </section>
 
-<!-- TESTIMONIALS -->
-<section id="testimonials">
-  <div class="reveal">
-    <div class="section-label">Primeros clientes</div>
-    <h2 class="section-title">Lo que dicen los<br>restauranteros</h2>
-  </div>
-  <div class="testimonials-grid reveal">
-    <div class="testimonial">
-      <div class="stars">★★★★★</div>
-      <p class="testimonial-text">"Por primera vez sé exactamente cuánto gana mi restaurante cada mes. Antes solo veía la caja, ahora veo el negocio completo."</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">🍽️</div>
-        <div><div class="author-name">Carlos M.</div><div class="author-role">Restaurante de autor, Puebla</div></div>
-      </div>
-    </div>
-    <div class="testimonial">
-      <div class="stars">★★★★★</div>
-      <p class="testimonial-text">"El costeo de menú me cambió la vida. Tenía platillos que me costaban más de lo que cobraba y no lo sabía. ROS me lo mostró en minutos."</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">☕</div>
-        <div><div class="author-name">Ana R.</div><div class="author-role">Cafetería, CDMX</div></div>
-      </div>
-    </div>
-    <div class="testimonial">
-      <div class="stars">★★★★★</div>
-      <p class="testimonial-text">"El módulo de fiscalidad me ayudó a entender cuánto debo apartar cada mes para el SAT. Nunca más sorpresas a fin de año."</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">🍷</div>
-        <div><div class="author-name">Diego L.</div><div class="author-role">Vinoteca, Guadalajara</div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- FAQ -->
 <section id="faq">
   <div class="reveal">
@@ -531,6 +543,9 @@ src="https://www.facebook.com/tr?id=1656119422255053&ev=PageView&noscript=1"
       <div class="faq-a">En la versión actual ingresas tus números manualmente, lo que toma menos de 15 minutos al mes. La integración automática con sistemas como Soft Restaurant y Parrot está en desarrollo.</div>
     </div>
   </div>
+  <p style="margin-top:28px;text-align:center;font-size:14px;color:var(--muted)">
+    ¿Tienes dudas específicas antes de comenzar? <a href="https://calendly.com/rodrigolezama6/intro-r-o-s" target="_blank" style="color:var(--accent);text-decoration:none">Agenda 15 minutos con Rodrigo</a>.
+  </p>
 </section>
 
 <!-- CTA FINAL -->
